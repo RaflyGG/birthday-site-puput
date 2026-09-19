@@ -1,3 +1,6 @@
+import { useState, useRef } from 'react';
+import Confetti from 'react-confetti';
+
 // 1. Daftar Hiasan Super Banyak!
 const daftarHiasan = [
   { id: 1, ikon: '🎈', kiri: '10%', atas: '15%', jeda: '0s' },
@@ -41,8 +44,72 @@ const daftarHiasan = [
 ];
 
 function App() {
+  const [isCardOpen, setIsCardOpen] = useState(false);
+  const audioRef = useRef(null);
+
+  const bukaKartu = () => {
+    setIsCardOpen(true);
+    // Putar lagu saat tombol diklik (karena browser butuh interaksi user dulu)
+    if (audioRef.current) {
+      audioRef.current.play();
+    }
+  };
+
+  const tutupKartu = () => {
+    setIsCardOpen(false);
+    // Boleh di-pause atau biarkan lagunya tetap jalan
+    // if (audioRef.current) audioRef.current.pause(); 
+  };
+
+  // Jika tombol sudah diklik, tampilkan halaman baru ini:
+  if (isCardOpen) {
+    return (
+      <div className="min-h-screen bg-pink-50 flex flex-col items-center justify-center p-5 relative overflow-hidden animasi-muncul">
+        
+        {/* --- Efek Confetti --- */}
+        <Confetti 
+          width={window.innerWidth} 
+          height={window.innerHeight} 
+          recycle={true}
+          numberOfPieces={300}
+          gravity={0.15}
+        />
+
+        {/* Dekorasi simpel di halaman baru */}
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-pink-200 via-pink-100 to-white opacity-70 pointer-events-none"></div>
+
+        {/* Kartu Ucapan */}
+        <div className="relative z-10 bg-white/90 backdrop-blur-md p-8 md:p-14 rounded-[3rem] shadow-2xl border-4 border-pink-200 text-center max-w-2xl transform transition-all duration-700 hover:scale-105 mx-4">
+          <h1 className="text-4xl md:text-5xl font-black text-pink-500 mb-6 drop-shadow-sm">
+            Selamat Ulang Tahun, Puput! 🎂
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-700 leading-relaxed font-medium mb-8">
+            First things first, i want to say Happy Birthday to my beloved girlfriend! i hope every plan, dreams and hope will come true! and i hope you always stay healthy and happy. Even though we have some problem lately, i always pray for you and i hope you can enjoy your birthday.love you!
+          </p>
+          <p className="text-xl md:text-2xl text-gray-700 leading-relaxed font-medium mb-8">
+            You're not just my girlfriend, you're my everything. I am so incredibly proud of you for everything you have been through and how strong you've become. I feel so lucky and happy to be by your side, and I always want to be with you, every single day, forever.
+          </p>
+          <p className="text-xxl md:text-2xl text-gray-700 leading-relaxed font-bold mb-8">
+            I LOVE YOU
+          </p>
+
+          <button
+            onClick={tutupKartu}
+            className="bg-purple-500 hover:bg-purple-600 transition-colors text-white font-bold py-3 px-8 rounded-full shadow-md hover:shadow-lg cursor-pointer"
+          >
+            ← Kembali
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Jika belum diklik, tampilkan halaman utama:
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-400 animasi-bg overflow-hidden p-5">
+    <div className="relative flex min-h-screen items-center justify-center bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-400 animasi-bg overflow-hidden p-5 animasi-muncul">
+      
+      {/* --- Elemen Audio (Tersembunyi) --- */}
+      <audio ref={audioRef} src="/backsound.mp3" loop />
 
       {/* --- Gambar SVG Bawaan --- */}
       <img src="/birthday-cake.svg" className="absolute top-5 left-5 w-24 gerak-acak-1 opacity-70" alt="Kue" />
@@ -112,17 +179,38 @@ function App() {
         )
       })}
 
-      {/* --- Kartu Ucapan Utama --- */}
-      <div className="relative z-10 rounded-3xl bg-white/80 p-10 text-center shadow-2xl backdrop-blur-md max-w-lg">
+      {/* --- Area Konten Utama --- */}
+      <div className="relative z-10 mt-52 md:mt-80">
+        <button
+          onClick={bukaKartu}
+          className="bg-pink-600 hover:bg-pink-700 transition-colors text-white font-bold py-4 px-8 rounded-full shadow-lg text-lg animate-bounce cursor-pointer"
+        >
+          Klik ini beb!
+        </button>
+      </div>
 
-        <h1 className="text-5xl font-bold text-pink-600 drop-shadow-sm">
-          Happy 19th, Puput! 🎉
-        </h1>
 
-        <p className="mt-5 text-xl text-gray-700 leading-relaxed">
-          Selamat ulang tahun! Semoga hari ini seindah senyummu dan tahun ini membawa banyak kebahagiaan baru.
-        </p>
+      {/* --- Judul Melengkung (Setengah Elips) --- */}
+      <div className="absolute z-1 mt-30 top-10 md:top-20 w-full flex justify-center pointer-events-none drop-shadow-xl animate-pulse" style={{ animationDuration: '3s' }}>
 
+        <svg viewBox="0 0 1000 350" className="w-[95vw] max-w-[900px] overflow-visible">
+          {/* Jalur (path) diperlebar agar muat untuk teks panjang */}
+          <path id="lengkungan" d="M 50,300 A 450,200 0 0,1 950,300" fill="transparent" />
+
+          {/* Menggunakan fontSize bawaan SVG agar proporsional dan tidak kepotong */}
+          <text fontSize="55" className="font-black teks-tema-imut" style={{ letterSpacing: '2px' }}>
+            <textPath href="#lengkungan" startOffset="50%" textAnchor="middle">
+              Happy birthday Puput sayangg!
+            </textPath>
+          </text>
+        </svg>
+
+      </div>
+
+      {/* --- Teks di bawahjudul --- */}
+      <div className="absolute z-10 top-[40%] md:top-[45%] w-full flex flex-col items-center justify-center gap-3 pointer-events-none drop-shadow-xl animate-pulse text-center" style={{ animationDuration: '3s' }}>
+        <p className="text-xl md:text-3xl font-bold text-white animate-bounce px-6">This is a birthday card from your boyfriend</p>
+        <p className="text-xl md:text-3xl font-bold text-white animate-bounce px-6">I hope this little thing can make your happiest birthday Sayangg!</p>
       </div>
 
 
